@@ -1,5 +1,5 @@
 ---
-title: "Activating and Maintaining the Contract"
+title: "Contract Activation: Establishing the Operative Frame"
 sidebarTitle: "Activation"
 description: "Learn what contract activation means, how to trigger it, and how to detect and recover from drift before it silently undermines a session."
 ---
@@ -21,10 +21,10 @@ The contract defines five numbered rules for activation:
     Activation means this file governs how the next response is **read, framed, and approached** — not only what actions are permitted.
   </Step>
   <Step title="The contract remains active for the session">
-    The contract stays in force for the entire session unless the operator explicitly states it does not apply to the current task. Treating the file as a one-time read is drift.
+    This contract remains active for the session unless the operator explicitly states it does not apply to the current task. Drift is present when this file is not the active frame for the next response — treating it as a one-time read, memory-only guidance, or background text is drift.
   </Step>
   <Step title="If drift is present, re-enter before continuing">
-    If drift is detected, the assistant must not proceed. Re-entry means rereading the file in full and reactivating it as the operative frame before continuing.
+    If drift is present, do not proceed. Re-entry means: reread this file in full and activate it as the operative frame before continuing.
   </Step>
 </Steps>
 

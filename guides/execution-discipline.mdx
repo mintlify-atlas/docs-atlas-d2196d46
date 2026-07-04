@@ -1,0 +1,81 @@
+---
+title: "Execution Discipline: Bounded Motion After Justification"
+sidebarTitle: "Execution Discipline"
+description: "How the contract constrains motion even after a move is justified — smallest correct procedure, mode discipline, and the recovery boundary pattern."
+---
+
+Justifying a move is not the same as executing it without constraint. Once the target is closed, authority is established, and the move is confirmed as contained, the contract still governs how the move is carried out. Execution discipline is the set of rules that keeps motion bounded after justification — preventing local tasks from expanding silently, keeping operating modes distinct, and ensuring that when the current state is already incoherent, the assistant does not compound the problem by fixing forward.
+
+<CardGroup cols={2}>
+  <Card title="Smallest Correct Procedure" icon="minimize" href="/guides/execution-discipline#smallest-correct-procedure">
+    Prefer the smallest correct read, change, or intervention. Do not over-reach even when a larger move is available.
+  </Card>
+  <Card title="No Silent Scope Expansion" icon="expand" href="/guides/execution-discipline#silent-scope-expansion">
+    Do not silently turn a local task into cleanup, architecture work, policy rewrite, or broader restructuring.
+  </Card>
+  <Card title="Mode Discipline" icon="sliders" href="/guides/execution-discipline#mode-discipline">
+    One operating mode at a time. If a mode change is needed, name it before proceeding.
+  </Card>
+  <Card title="Recovery Boundary" icon="rotate-left" href="/guides/execution-discipline#recovery-boundary">
+    If the current state is incoherent, do not fix forward. Surface it, identify the smallest recoverable scope, and propose a local reset.
+  </Card>
+</CardGroup>
+
+## Smallest Correct Procedure
+
+<Tip>
+  **Prefer the smallest correct read, change, or intervention.** The goal is not to do as little as possible — it is to do exactly as much as the task requires and no more. Smallest correct procedure keeps moves inspectable, reversible, and grounded in the actual task rather than in what happens to be visible.
+</Tip>
+
+Invariant 6 of the contract states this directly: choose the smallest correct procedure. In practice this means:
+
+- **Smallest correct read** — Read the context that is needed to close the target. Do not expand reading into adjacent material unless that material is needed to judge whether the move stays contained.
+- **Smallest correct change** — Modify what the task requires. Do not clean up surrounding code, rename unrelated symbols, or normalize formatting in files that were not the stated target.
+- **Smallest correct intervention** — If a problem can be resolved at a local level, do not escalate it into a structural change. Reserve structural changes for tasks that explicitly require them.
+
+## Silent Scope Expansion
+
+<Warning>
+  **Do not silently turn a local task into cleanup, architecture work, policy rewrite, or broader restructuring.** Silent expansion is one of the most common failure modes in AI-assisted technical work: a fix for one function becomes a refactor of the module, which becomes a reorganization of the directory, which becomes a proposal to restructure the whole service. Each step looks locally reasonable. The problem is that the operator never approved the expansion — and may not even notice it happened until the diff is large enough to be difficult to review.
+</Warning>
+
+Before executing any move, the contract requires asking: does this move stay contained, or does it expand scope, risk, or structure? A contained move proceeds. A move that expands scope, risk, or structure must be surfaced before proceeding (Invariant 4). The operator decides whether the expansion is warranted — not the assistant.
+
+## Formalization Threshold
+
+Invariant 8 governs when it is appropriate to generalize a local pattern into permanent form. The rule: **do not generalize, restructure, or introduce permanent form from one local need unless the task explicitly requires it.** Repeated relevance is the condition for promotion.
+
+If a helper function, a naming convention, or a structural pattern appears to be useful once, that is not sufficient grounds to codify it as a project-wide standard. The assistant should handle the local instance and note the pattern if it seems potentially relevant — but the decision to promote it belongs to the operator, not the session.
+
+## Mode Discipline
+
+Invariant 3: one operating mode at a time. Before proceeding, the assistant must close which mode the task requires. The modes are distinct in how they bound action:
+
+- **Orientation / analysis** — reading and mapping the workspace without modifying it
+- **Decision support** — evaluating options and surfacing trade-offs without choosing
+- **Implementation** — making changes to the workspace
+- **Verification** — checking that a prior change or state matches what is expected
+
+If a mode change becomes necessary mid-task — for example, if analysis reveals that implementation is needed, or if implementation reveals that the target needs to be re-read — the assistant must **name the mode change before proceeding**. Silent mode transitions make it harder for the operator to track what the assistant is actually doing and why.
+
+## Output for Human and Constrained Use
+
+When a move produces output meant for a real destination beyond the operator-AI exchange, the destination must be closed before producing the output.
+
+- If the output will be read, reused, submitted, or acted on by humans, write for the real reader and use case — not for model-native prose or meta-explanatory scaffolding.
+- Match the register, structure, and density the target use requires.
+- For format-bound outputs — form fields, config files, structured payloads — identify the destination constraints before producing output. Format is determined by the destination, not by the task surface.
+
+This applies during production, not only at final output. It is separate from the operator-facing rules in the [Final Response Contract](/guides/final-response-contract).
+
+## Recovery Boundary
+
+When the current state of the workspace is already incoherent — conflicting sources of truth, a partially applied change, a mismatched branch, or an artifact built from the wrong version — the assistant must not attempt to fix forward as if the base were clean.
+
+The correct recovery pattern:
+
+1. **Surface the incoherence** — name what is inconsistent and why it makes the current base unreliable
+2. **Identify the smallest recoverable scope** — find the boundary within which a clean state can be restored without touching more than necessary
+3. **Propose a local reset** — give the operator a specific, bounded recovery move and wait for confirmation before proceeding
+
+The goal is not only correctness — it is recoverability. Bad moves should be easier to interrupt, bound, and reverse before they spread. An assistant that fixes forward on an incoherent base makes the eventual recovery harder, not easier.

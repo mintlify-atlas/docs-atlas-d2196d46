@@ -1,47 +1,69 @@
 ---
-title: "Quickstart"
-description: "Begin with a guide on the fastest path to a successful outcome"
+title: "Get Started with SensecraftXStudio"
+sidebarTitle: "Quickstart"
+description: "Copy AGENTS.md into your workspace, activate it with one instruction, and give the assistant a cognitively bounded frame for real technical work."
 ---
 
-Describe how someone begins using your product. What is the first thing they need to do? Are there any prerequisites?
+SensecraftXStudio ships as a single file: `AGENTS.md`. There is no package to install, no runtime to configure, and no SDK to import. This guide walks you through placing that file in your workspace, activating it with your assistant, and understanding what changes the moment it becomes the operative frame for a session.
 
-A quickstart should take someone from zero to using your product. They'll get a quick win and a sense of what they can accomplish.
+<Note>
+  SensecraftXStudio is not a software library, an SDK, a runtime worker, or a generic prompt collection. It is a compact operational contract that governs how an AI assistant reads, decides, acts, stops, and reports when the work has real technical consequence.
+</Note>
 
-## Prerequisites
-
-Before you begin, you must have:
-
-- Requirement one (for example, Node.js 18+, a free account, an API key)
-- Requirement two (for example, a compatible device, a compatible browser, a compatible operating system)
-
-## Get started
+## Steps to adopt SensecraftXStudio
 
 <Steps>
-  <Step title="Install">
-    Describe how to install your product or sign up.
+  <Step title="Copy AGENTS.md into your project or workspace">
+    Download or copy [`AGENTS.md`](https://github.com/XxYouDeaDPunKxX/SensecraftXStudio/blob/main/AGENTS.md) from the repository and place it at the root of the project or workspace where the assistant will be working. The file must be readable by the assistant — put it somewhere the session can reach it directly.
+  </Step>
 
-    ```bash
-    npm install your-package
+  <Step title="Start a fresh assistant session">
+    Open a new session in an environment where the assistant can read workspace files. A clean session avoids carryover from prior context that could conflict with or silently override the contract before it is activated.
+  </Step>
+
+  <Step title="Instruct the assistant to read AGENTS.md in full">
+    Before giving any task, tell the assistant to read the file completely. A partial read or a summary is not activation. The contract covers layered concerns — activation, scope, operating posture, invariants, stop conditions, and the final response contract — and every layer matters.
+  </Step>
+
+  <Step title="Tell the assistant to use it as the operative working frame">
+    Reading is not enough on its own. The assistant must treat the file as the active frame that governs how it reads the task, bounds the move, and reports the result. Use the canonical minimal instruction below.
+
+    ```text
+    Read AGENTS.md in full and use it as the operative frame before acting on this workspace.
     ```
   </Step>
-  <Step title="Configure">
-    Describe any setup or configuration needed before first use.
 
-    ```bash
-    your-cli init
-    ```
-  </Step>
-  <Step title="Run it">
-    Show the first thing a user does to see it working.
-
-    ```bash
-    your-cli start
-    ```
+  <Step title="Give the real task">
+    With the contract active, give the task normally. The assistant now has a working frame that asks it to close the real target before acting, surface consequential expansion, prefer the smallest correct move, and report its epistemic state honestly when it closes.
   </Step>
 </Steps>
 
 <Tip>
-  Give people a way to get help. This could be a link to a support page, a chat with a customer support agent, or a forum for your product.
-
-  Example: Need help? Reach out to us at [support@yourcompany.com](mailto:support@yourcompany.com).
+  The file should stay active as a working frame throughout the session — not be treated as text that was read once and then forgotten. If the assistant appears to have drifted from the contract (jumping to conclusions, silently expanding scope, or presenting inference as verified fact), the correct recovery is to ask it to reread `AGENTS.md` in full and reactivate it as the operative frame before continuing.
 </Tip>
+
+## Fill in the Project Bootstrap section
+
+`AGENTS.md` includes a **Project Bootstrap** block near the top. This section is intentionally left blank in the canonical file so you can fill it in before the first real session.
+
+```text
+Project:          (repo or project name; example: frontend-app)
+Canonical path:   (where the main working version lives; example: C:\work\frontend-app)
+Auxiliary area:   (linked folder for lab, storage, or staging material; example: C:\work\frontend-app-lab)
+Technical context:(main language, runtime, or hard constraint; example: TypeScript, local Windows workspace, limited git history)
+
+Do not touch:     (only absolute project boundaries; example: production deploy folder)
+```
+
+An empty bootstrap means instance context is still open. Filling it gives the assistant a grounded starting point — canonical paths, technical constraints, and hard boundaries — before it reads anything else in the workspace. See the [Project Bootstrap guide](/guides/project-bootstrap) for a full walkthrough of each field.
+
+## What you get from here
+
+<CardGroup cols={2}>
+  <Card title="How It Works" icon="gear" href="/how-it-works">
+    Understand the failure patterns SensecraftXStudio addresses, what the contract changes about the session rhythm, and how the state footer keeps closure inspectable.
+  </Card>
+  <Card title="Project Bootstrap" icon="folder-open" href="/guides/project-bootstrap">
+    Step-by-step guidance on filling in the Project Bootstrap section so the assistant has a grounded, instance-specific context before acting.
+  </Card>
+</CardGroup>

@@ -1,0 +1,115 @@
+---
+title: "How SensecraftXStudio Works"
+sidebarTitle: "How It Works"
+description: "Learn the failure patterns SensecraftXStudio addresses, what the contract changes about the session rhythm, and how the state footer keeps closure inspectable."
+---
+
+The core problem that SensecraftXStudio addresses is not that AI assistants are incapable. The problem is that an assistant can stay plausible after the frame has already drifted. It continues producing output that sounds coherent, reads as confident, and feels like progress — while the actual target has shifted, the move has expanded beyond its stated scope, or inference has started passing as verified fact. By the time the operator notices, the session has traveled far from where it should have stopped and asked. SensecraftXStudio is built to make that drift visible before it becomes consequential.
+
+## The failure patterns it addresses
+
+Without an active working frame, an assistant moving through a technical session tends to follow the path of least resistance. These are the common failure modes that accumulate when that goes unchecked.
+
+<AccordionGroup>
+  <Accordion title="The nearest visible file becomes the assumed target">
+    When the real object of a task is not explicitly closed, the assistant defaults to whatever is most immediately visible in the workspace — the open file, the most recently mentioned path, the first match in a search. Apparent proximity substitutes for confirmed identity.
+  </Accordion>
+
+  <Accordion title="A local fix turns into cleanup, and cleanup turns into architecture">
+    A bounded change to one function becomes a tidy of the whole module. A tidy of the module becomes a structural reorganisation. Each step follows local logic, but the scope has expanded silently at every turn without the operator's awareness or consent.
+  </Accordion>
+
+  <Accordion title="One isolated case becomes a new permanent structure">
+    The assistant encounters a single instance of a pattern and formalises it — introducing a new abstraction, a new convention, or a new policy — when the task required only a local correction. Repeated relevance is the real threshold for promotion; a single case is not.
+  </Accordion>
+
+  <Accordion title="Inference starts sounding like verification">
+    The assistant reads a file, makes a reasonable inference about state, and reports that inference using the same register it would use to report a verified fact. The operator has no signal that the confidence expressed is not grounded in actual inspection.
+  </Accordion>
+
+  <Accordion title="The assistant keeps fixing forward on an incoherent base">
+    When the current state is already inconsistent or broken, the assistant continues making moves as if the base were clean — stacking corrections on top of unresolved incoherence rather than surfacing the underlying problem and proposing a reset.
+  </Accordion>
+
+  <Accordion title="The final report sounds cleaner than the actual state">
+    The closing summary presents the session as converged and complete when open questions remain, uninspected areas exist, or some of what was stated was inferred rather than confirmed. The report is rhetorically tidy rather than epistemically honest.
+  </Accordion>
+</AccordionGroup>
+
+## What the contract changes
+
+SensecraftXStudio pushes the session toward a different rhythm. Each of these is a concrete change to how the assistant reads and moves through work.
+
+<CardGroup cols={2}>
+  <Card title="Close the real target before acting" icon="crosshairs">
+    Distinguish the stated request, the actual local task, and the real object being touched before any move is made. Do not act before the target is closed enough to identify what is being touched, under what authority, and where it actually lives.
+  </Card>
+  <Card title="Distinguish local task from larger object" icon="layers">
+    The task is a point. The system around it is the volume of relations. Read the volume before acting on the point — and keep the local task clearly separate from the larger object it touches.
+  </Card>
+  <Card title="Surface consequential expansion before proceeding" icon="triangle-exclamation">
+    Before acting, ask whether the move stays contained or expands scope, risk, or structure. A contained move proceeds. A move that crosses a perimeter is named and surfaced before it executes.
+  </Card>
+  <Card title="Prefer the smallest correct move" icon="minimize">
+    Choose the smallest correct read, change, or intervention. Do not silently turn a local task into cleanup, architecture work, or a policy rewrite.
+  </Card>
+  <Card title="Keep epistemic states separate" icon="flask">
+    Verified, inferred, hypothetical, unresolved, and uninspected states are not the same thing. They must not be reported in the same register or presented with the same confidence.
+  </Card>
+  <Card title="Stop when ambiguity would change the move" icon="hand">
+    Inspect before asking. But when resolving an ambiguity would change the target, authority, scope, risk, or meaning — ask and wait rather than assume and proceed.
+  </Card>
+  <Card title="Report closure as task state, not rhetoric" icon="clipboard-check">
+    The final report reflects the actual state of the task: what is converged, what is blocked, what is still open. It is not a summary shaped to sound complete.
+  </Card>
+</CardGroup>
+
+## Before action: opening the cognitive plane
+
+Before any move is chosen, the contract requires the assistant to open the cognitive plane of the task. This is not a demand for long analysis on every request. It is a structural check against jumping from the first plausible reading straight into execution.
+
+The assistant must surface:
+
+1. **The obvious move** — what the surface reading suggests as the immediate action
+2. **The real object being touched** — the actual file, state, or surface that the move affects, not just what mentions it
+3. **The surrounding context** — the system of relations that gives the move meaning and determines whether it stays local
+4. **Valid alternative readings** — other legitimate interpretations of the task that have not yet been closed
+5. **Containment or expansion** — whether the move stays within scope or crosses a perimeter that needs to be named before proceeding
+6. **Why this is the smallest correct move** — the explicit justification for selecting this move over the alternatives
+
+<Info>
+  The horizontal plane in `AGENTS.md` captures this as a three-axis skeleton: **A** — close context before acting (object, authority, mode); **B** — read the move before executing it (contained vs. expansion); **C** — execute minimally and report honestly (procedure, epistemic state, closure). These axes are the internal basis for opening the cognitive plane.
+</Info>
+
+## After action: the state footer
+
+When a response includes a change, a recommendation, or a finding with operational consequence, the assistant closes with a compact state footer. These four fields keep the operator's cognitive map of the session accurate and inspectable.
+
+<CardGroup cols={2}>
+  <Card title="Touch" icon="hand-pointer" href="/how-it-works">
+    What was changed, and what was left untouched within the expected scope. Omitted if nothing was modified.
+  </Card>
+  <Card title="Ground" icon="cube" href="/how-it-works">
+    What the move or conclusion was grounded on. One line unless more detail is needed to avoid ambiguity.
+  </Card>
+  <Card title="State" icon="list-check" href="/how-it-works">
+    What is verified, inferred, unresolved, or not inspected. The field that keeps epistemic honesty visible after closure.
+  </Card>
+  <Card title="Convergence" icon="compass" href="/how-it-works">
+    Whether the task is converged, divergent, or blocked. The field that prevents the session from ending on rhetoric rather than actual task state.
+  </Card>
+</CardGroup>
+
+<Tip>
+  The state footer fields should stay aligned with the actual task state as work proceeds — not be reconstructed from memory only at the end. An honest footer written mid-session is more reliable than a polished one assembled after the fact.
+</Tip>
+
+These four fields together give the operator a clearer cognitive map of the session: what was seen, what was assumed, what was chosen, what was avoided, and what remains unsafe to close.
+
+## The aim
+
+SensecraftXStudio does not try to make the assistant more capable or more certain. Its goal is narrower and more useful than that.
+
+> **The aim is not to make the assistant more confident. The aim is to make its confidence harder to fake.**
+
+A session governed by this contract produces output where the grounding is visible, the epistemic state is declared, the scope is bounded, and the closure is either genuinely justified or honestly withheld. That makes the operator's review faster, the session's moves more recoverable, and the assistant's behavior more trustworthy in the places where it matters most.

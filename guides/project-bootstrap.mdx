@@ -1,0 +1,69 @@
+---
+title: "Project Bootstrap: Setting Instance Context"
+sidebarTitle: "Project Bootstrap"
+description: "How to fill the Project Bootstrap section so the contract has the instance-specific context it needs before work begins on a real workspace."
+---
+
+The Project Bootstrap section is where the operator supplies the instance-specific context that the contract needs before it can govern a real workspace session. Without it, the contract's operational rules are active but the assistant has no grounded picture of what project it is working inside, where the canonical source lives, what is adjacent, or what must not be touched. An empty bootstrap means instance context is still open — the contract can be activated, but it cannot yet be relied upon for instance-specific decisions.
+
+<Note>
+  An empty bootstrap means instance context is still open. The contract activates and governs posture and procedure, but any inference about project structure, paths, or scope will be ungrounded until the bootstrap fields are filled.
+</Note>
+
+## The Bootstrap Template
+
+Fill every field before relying on the contract for project-specific context. The template as it appears in `AGENTS.md`:
+
+```text
+Project: (repo or project name; example: frontend-app)
+Canonical path: (where the main working version lives; example: C:\work\frontend-app)
+Auxiliary area: (linked folder for lab, storage, or staging material; example: C:\work\frontend-app-lab)
+Technical context: (main language, runtime, or hard constraint; example: TypeScript, local Windows workspace, limited git history)
+
+Do not touch: (only absolute project boundaries; example: production deploy folder)
+-
+```
+
+## Field Reference
+
+**Project** — The name of the repo or project this session is operating inside. This closes the identity of the workspace. The assistant uses this to anchor all subsequent references to project material.
+
+**Canonical path** — The filesystem location where the main working version of the project lives. This is the authoritative source. When a path is ambiguous, the canonical path resolves it.
+
+**Auxiliary area** — A linked folder used for lab work, staging material, archival content, or experimental branches. It is adjacent to the canonical path but not the source of truth. Knowing this boundary prevents the assistant from treating lab material as canonical.
+
+**Technical context** — The primary language, runtime, or hard constraint that shapes how every move in this session must be approached. Examples: TypeScript strict mode, a local Windows workspace with no remote push access, or a legacy codebase with limited git history. This is not an exhaustive tech stack — it is the constraint that matters most.
+
+**Do not touch** — Absolute project boundaries. These are not task-level exclusions (which belong in the task prompt). They are standing constraints that apply for the entire session regardless of what the task requests. If a move would cross a "Do not touch" boundary, it is a stop condition. The list uses `-` as a placeholder when no boundaries are defined.
+
+## Filled-In Example
+
+<CodeGroup>
+
+```text Template (blank)
+Project: (repo or project name; example: frontend-app)
+Canonical path: (where the main working version lives; example: C:\work\frontend-app)
+Auxiliary area: (linked folder for lab, storage, or staging material; example: C:\work\frontend-app-lab)
+Technical context: (main language, runtime, or hard constraint; example: TypeScript, local Windows workspace, limited git history)
+
+Do not touch: (only absolute project boundaries; example: production deploy folder)
+-
+```
+
+```text Example (filled)
+Project: billing-service
+Canonical path: C:\work\billing-service
+Auxiliary area: C:\work\billing-service-lab
+Technical context: TypeScript, Node 20, local Windows workspace, no remote push — review only
+
+Do not touch: production deploy folder at C:\deploys\billing-service\prod
+- C:\deploys\billing-service\prod
+```
+
+</CodeGroup>
+
+## What "Do Not Touch" Is Not
+
+The "Do not touch" field is for **absolute project boundaries** — constraints that hold for the entire session regardless of any individual task. It is not the right place for task-level scoping such as "only edit the auth module" or "leave the tests alone for now." Those belong in the task prompt, not the bootstrap.
+
+Setting "Do not touch" too broadly weakens the contract by making it ambiguous. Setting it too narrowly leaves genuine hard boundaries unprotected. The right entries are locations or surfaces where a mistake would have consequences that cannot be recovered from within the session: production artifacts, deployed configuration, or shared infrastructure that other projects depend on.

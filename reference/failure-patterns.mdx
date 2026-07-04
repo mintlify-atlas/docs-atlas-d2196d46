@@ -1,0 +1,180 @@
+---
+title: "Common AI Failure Patterns SensecraftXStudio Addresses"
+sidebarTitle: "Failure Patterns"
+description: "The seven failure patterns SensecraftXStudio is built to counteract, with the contract clauses and invariants that address each one."
+---
+
+SensecraftXStudio is not a general-purpose improvement to AI quality — it is a specific set of constraints designed to counteract a specific set of failure patterns. These patterns are not exotic edge cases. They appear regularly in any AI-assisted technical session where the assistant moves from a surface reading of a request straight into action without adequately bounding the move. The core problem, as the README states, is that **an AI can stay plausible after the frame has already drifted** — and that plausibility is what makes these failures hard to catch in the moment.
+
+<AccordionGroup>
+
+  <Accordion title="1 — The nearest visible file becomes the assumed target">
+    **What it looks like:**
+
+    The assistant is asked to update a configuration value. It finds a file that mentions the value, assumes that file is the canonical target, and modifies it — without verifying whether it is the real authoritative source, whether another file owns the setting in the active environment, or whether the modification will propagate correctly.
+
+    **Why it happens:**
+
+    Assistants navigate by salience. The first file that matches a surface description of the request is the easiest candidate to act on. Without a discipline of closing the real object before acting, salience replaces authority.
+
+    **Which contract clause addresses it:**
+
+    [Derived Invariant 1](/reference/derived-invariants) — *Close object before acting* — directly requires the assistant to distinguish the stated request, the actual local task, and the real object being touched before any action. [Derived Invariant 2](/reference/derived-invariants) — *Authority is not inferred from surface signals* — prevents filename or apparent relevance from substituting for verified authority.
+
+    <Warning>
+      This is the foundational failure pattern. Most of the other patterns listed here either begin with or compound upon an incorrect target assumption.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="2 — A local fix turns into cleanup">
+    **What it looks like:**
+
+    The assistant is asked to correct a single malformed import. While editing the file, it notices other style inconsistencies and "cleans them up" — renaming variables, reformatting blocks, removing what appears to be dead code. The operator receives a diff far larger than the task they issued.
+
+    **Why it happens:**
+
+    Assistants have a strong implicit tendency toward coherence and tidiness. Once inside a file, the path of least resistance is to resolve anything that looks like a problem — not just the targeted problem. Without an explicit constraint on scope, "fixing nearby things" feels productive.
+
+    **Which contract clause addresses it:**
+
+    [Derived Invariant 6](/reference/derived-invariants) — *Choose the smallest correct procedure* — prohibits silently turning a local task into cleanup. [Derived Invariant 4](/reference/derived-invariants) — *Surface consequential expansion before proceeding* — requires that the scope expansion be named and approved before it executes.
+  </Accordion>
+
+  <Accordion title="3 — Cleanup turns into architecture">
+    **What it looks like:**
+
+    The local cleanup from pattern 2 reveals a structural inconsistency. The assistant decides the right fix is to introduce a new abstraction, extract a shared utility, or reorganize how several files relate to each other. The original one-line task has become an architectural intervention.
+
+    **Why it happens:**
+
+    Each escalation from local fix to cleanup to architecture is locally justifiable. The assistant can construct a coherent rationale for each step. The problem is not that the rationale is false — it is that the operator did not authorize the trajectory, and the final state of the workspace may be significantly different from what they expected.
+
+    **Which contract clause addresses it:**
+
+    [Derived Invariant 6](/reference/derived-invariants) — *Choose the smallest correct procedure* — and [Derived Invariant 8](/reference/derived-invariants) — *Do not formalize from a single instance* — together block the path from cleanup to architecture. Repeated relevance, not local coherence, is the threshold for introducing permanent structure.
+
+    <Note>
+      This is the three-step escalation that the contract's "smallest correct procedure" invariant is most directly aimed at stopping. The steps are individually plausible; the compounded result is not what was requested.
+    </Note>
+  </Accordion>
+
+  <Accordion title="4 — One isolated case becomes a new permanent structure">
+    **What it looks like:**
+
+    The assistant is asked to handle a specific edge case in one location. It decides the edge case is general enough to warrant a new helper function, a new policy constant, or a new file structure that can handle "this class of problem." The one-off need becomes a permanent architectural addition.
+
+    **Why it happens:**
+
+    Generalization feels like quality engineering. Assistants trained on good software practices will often over-apply the principle of "don't repeat yourself" or "extract when there's a pattern" — without noticing that a single instance is not a pattern.
+
+    **Which contract clause addresses it:**
+
+    [Derived Invariant 8](/reference/derived-invariants) — *Do not formalize from a single instance* — is the direct constraint. The contract makes "repeated relevance" the explicit threshold for promotion to permanent form. A single need, no matter how cleanly it could be generalized, does not meet that threshold unless the task explicitly requires it.
+  </Accordion>
+
+  <Accordion title="5 — Inference starts sounding like verification">
+    **What it looks like:**
+
+    The assistant reports that a configuration "is set to X," that a function "returns Y in all cases," or that a file "is the canonical source" — when in fact it inferred these things from context rather than directly confirming them. The operator treats the report as verified fact and makes decisions based on it.
+
+    **Why it happens:**
+
+    Fluent language naturally sounds confident. An assistant that has built up a working model of the codebase will produce confident-sounding statements about things it has inferred, and the linguistic register of inference ("appears to be," "likely") is easy to omit when the inference feels solid.
+
+    **Which contract clause addresses it:**
+
+    [Derived Invariant 7](/reference/derived-invariants) — *Keep verified, inferred, and hypothetical states distinct* — requires epistemic status to be legible in both reasoning and output. The [Final Response Contract](/guides/final-response-contract) enforces this at the output level through the **State** field. See also [Epistemic States](/concepts/epistemic-states) for the full taxonomy.
+
+    <Warning>
+      This failure pattern is particularly dangerous because it is invisible until the operator acts on the incorrect belief. The contract's epistemic discipline is the primary mitigation.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="6 — The assistant keeps fixing forward on an incoherent base">
+    **What it looks like:**
+
+    Something in the workspace is already broken, inconsistent, or in an indeterminate state. The assistant recognizes the symptoms but continues attempting to push the task forward anyway — adding changes that assume a clean base, compounding the incoherence, and making the eventual recovery harder.
+
+    **Why it happens:**
+
+    Assistants have strong completion pressure. An open task feels like something to finish. Surfacing that the base is too incoherent to support forward action requires the assistant to voluntarily stop, which goes against the grain of task completion. It is easier to attempt a fix and see what happens.
+
+    **Which contract clause addresses it:**
+
+    The [Stop Conditions](/concepts/stop-conditions) section of the contract explicitly lists "the current state is already incoherent and cannot be trusted as a clean base for forward fixing" as a hold condition. The contract prescribes a specific recovery pattern: surface the incoherence, identify the smallest recoverable scope, propose a local reset — and *then* proceed. Forward fixing on an incoherent base is explicitly prohibited.
+  </Accordion>
+
+  <Accordion title="7 — The final report sounds cleaner than the actual state">
+    **What it looks like:**
+
+    The assistant completes a task and closes with a summary that presents the outcome as clean and resolved — omitting the things it did not inspect, the inferences it made, the things it left ambiguous, and the conditions it cannot verify. The operator walks away with a false picture of closure.
+
+    **Why it happens:**
+
+    Summary text is naturally optimized toward resolution. An assistant producing a closing statement has implicit pressure to make the closure sound complete. The details that would qualify the summary — "I didn't inspect X," "this is inferred, not verified," "this remains ambiguous" — are easy to omit because they make the response sound less helpful.
+
+    **Which contract clause addresses it:**
+
+    [Derived Invariant 9](/reference/derived-invariants) — *Report with disciplined closure* — and the [Final Response Contract](/guides/final-response-contract) together require that closure be reported as actual task state, not as rhetoric. The four-field footer (Touch, Ground, State, Convergence) forces the assistant to name what was not inspected, what was inferred, and whether the task is genuinely converged or still open.
+
+    <Note>
+      The README's framing is precise: "report closure as task state, not rhetoric." The Final Response Contract is the mechanism that makes this enforceable.
+    </Note>
+  </Accordion>
+
+</AccordionGroup>
+
+---
+
+## The broader failure: staying plausible after the frame has drifted
+
+Beyond the seven specific patterns above, there is a structural failure that underlies all of them. As the README states: **AI can stay plausible after the frame has already drifted.** This is what makes AI-assisted technical work genuinely risky in ways that are hard to catch.
+
+A good assistant produces fluent, coherent-sounding output. That fluency continues even when the working frame has quietly shifted — when the assumed target is wrong, when scope has expanded silently, when inference is being presented as fact. The output still sounds like it knows what it is doing, because fluency is not coupled to correctness.
+
+SensecraftXStudio addresses this by making the frame itself inspectable. The operator should not have to infer what the assistant is assuming, what it has verified, or what it considers in scope. Those things should be visible in the response structure — before action and after it.
+
+---
+
+## How the contract changes this
+
+With SensecraftXStudio active, the session is pushed toward a different rhythm. Each of the following corresponds to one or more invariants that enforce it:
+
+<Steps>
+  <Step title="Close the real target before acting">
+    Before any move, the assistant identifies what is actually being touched — not the nearest visible candidate, but the verified real object. ([Invariant 1](/reference/derived-invariants))
+  </Step>
+  <Step title="Distinguish the local task from the larger object it touches">
+    The stated request, the actual local task, and the real object being touched are held as distinct until they are confirmed to be the same. ([Invariant 1](/reference/derived-invariants), [Invariant 3](/reference/derived-invariants))
+  </Step>
+  <Step title="Surface consequential expansion before proceeding">
+    If a move would expand scope, risk, or structure, that expansion is named and surfaced before it executes — not reported afterward as a helpful addition. ([Invariant 4](/reference/derived-invariants))
+  </Step>
+  <Step title="Prefer the smallest correct read, change, or intervention">
+    The default is the most contained valid move that closes the task. Escalation requires explicit justification, not just local coherence. ([Invariant 6](/reference/derived-invariants), [Invariant 8](/reference/derived-invariants))
+  </Step>
+  <Step title="Keep verified, inferred, hypothetical, unresolved, and uninspected states separate">
+    Epistemic status is made legible throughout the session — in reasoning, in action choices, and in the final report. ([Invariant 7](/reference/derived-invariants), [Epistemic States](/concepts/epistemic-states))
+  </Step>
+  <Step title="Stop when ambiguity would change the meaning of the move">
+    The assistant stops and asks when the answer would change the target, authority, scope, risk, or meaning of the move — not for comfort, but for consequence. ([Invariant 5](/reference/derived-invariants), [Stop Conditions](/concepts/stop-conditions))
+  </Step>
+  <Step title="Report closure as task state, not rhetoric">
+    The closing report names what was touched, what it was grounded on, what is verified versus inferred, and whether the task is genuinely converged — using the Final Response Contract footer when the response has operational consequence. ([Invariant 9](/reference/derived-invariants))
+  </Step>
+</Steps>
+
+<CardGroup cols={2}>
+  <Card title="Derived Invariants" icon="shield-check" href="/reference/derived-invariants">
+    The 11 behavioral rules that enforce this rhythm in every response.
+  </Card>
+  <Card title="Stop Conditions" icon="hand" href="/concepts/stop-conditions">
+    The conditions under which the assistant must stop and surface rather than proceed.
+  </Card>
+  <Card title="Epistemic States" icon="microscope" href="/concepts/epistemic-states">
+    The taxonomy of verified, inferred, hypothetical, unresolved, and uninspected states.
+  </Card>
+  <Card title="Final Response Contract" icon="file-contract" href="/guides/final-response-contract">
+    The output-level enforcement mechanism: Touch, Ground, State, Convergence.
+  </Card>
+</CardGroup>

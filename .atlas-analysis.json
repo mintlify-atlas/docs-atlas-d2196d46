@@ -1,0 +1,74 @@
+{
+  "projectType": "general",
+  "projectName": "SensecraftXStudio",
+  "projectDescription": "A compact operational contract that keeps AI assistants cognitively bounded, disciplined, and reviewable during consequential technical work.",
+  "theme": "luma",
+  "primaryColor": "#6366F1",
+  "lightColor": "#818CF8",
+  "darkColor": "#4F46E5",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "how-it-works"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/operating-posture",
+              "concepts/horizontal-plane",
+              "concepts/epistemic-states",
+              "concepts/stop-conditions"
+            ]
+          },
+          {
+            "group": "Using the Contract",
+            "pages": [
+              "guides/activation",
+              "guides/project-bootstrap",
+              "guides/execution-discipline",
+              "guides/final-response-contract"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "reference/derived-invariants",
+              "reference/failure-patterns",
+              "reference/faq"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Pre-action cognitive framing: forces the assistant to close target, authority, and mode before acting",
+    "Horizontal Plane (A/B/C) operating skeleton for bounded, inspectable decisions",
+    "Derived invariants that turn posture into repeatable behavioral constraints",
+    "Stop conditions that halt action when the move is not clean enough to proceed",
+    "Final Response Contract footer (Touch / Ground / State / Convergence) for honest closure",
+    "Recovery boundary protocol for incoherent states",
+    "Output discipline for human and constrained-destination use cases",
+    "Drift detection and re-entry mechanism to keep the contract active across a session"
+  ],
+  "publicApiSurface": [
+    "AGENTS.md — canonical operational contract file",
+    "Contract Activation protocol",
+    "Project Bootstrap section",
+    "Operating Posture",
+    "Horizontal Plane: A (close context), B (read the move), C (execute minimally and report honestly)",
+    "Derived Invariants 1–11",
+    "Stop Conditions",
+    "Final Response Contract (Touch / Ground / State / Convergence)",
+    "Output for Human and Constrained Use",
+    "Recovery Boundary pattern"
+  ]
+}

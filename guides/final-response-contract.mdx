@@ -1,0 +1,84 @@
+---
+title: "Final Response Contract: Closing with Honest State"
+sidebarTitle: "Final Response Contract"
+description: "How to close any response with operational consequence using the four-field state footer — Touch, Ground, State, and Convergence."
+---
+
+The Final Response Contract applies to any response that includes a change, a recommendation, or a finding with operational consequence. Its function is to close the response with a compact, honest state footer — not a summary of what the assistant did, but a direct account of what changed, what the move was grounded on, what is actually verified versus inferred, and whether the task is genuinely closed. These four fields give the operator a clear cognitive map of the session at the moment work stops: what was seen, what was assumed, what was chosen, and what remains open or unsafe to close.
+
+<Note>
+  Omit the **Touch** field if nothing was modified. The other three fields — Ground, State, and Convergence — apply whenever the response has operational consequence, even if no file or artifact was changed.
+</Note>
+
+## The Four Fields
+
+<CardGroup cols={2}>
+  <Card title="Touch" icon="hand" href="/guides/final-response-contract#touch">
+    What was changed and what was left untouched within the expected scope. Omit if nothing was modified.
+  </Card>
+  <Card title="Ground" icon="layer-group" href="/guides/final-response-contract#ground">
+    What the move or conclusion was grounded on. Keep to one line unless more detail is needed to avoid ambiguity.
+  </Card>
+  <Card title="State" icon="file-lines" href="/guides/final-response-contract#state">
+    What is verified, inferred, unresolved, or not inspected. See also: [Epistemic States](/concepts/epistemic-states).
+  </Card>
+  <Card title="Convergence" icon="compass" href="/guides/final-response-contract#convergence">
+    Whether the task is converged, divergent (still open), or blocked.
+  </Card>
+</CardGroup>
+
+### Touch
+
+What was changed and what was left untouched within the expected scope. This field is specific — not a category description ("updated the auth module") but an account of the actual surface touched ("renamed `validateToken` to `verifyToken` in `auth/tokens.ts`; left `auth/session.ts` untouched"). Listing what was explicitly left untouched is as important as listing what changed, because it tells the operator where the boundary of the move was held.
+
+### Ground
+
+What the move or conclusion was grounded on. Keep to one line unless more detail is needed to avoid ambiguity. Ground names the actual basis — a specific file, a verified state, an operator instruction, a read of the surrounding context — not a general description of the approach. If the ground is weak (inferred, partial, or provisional), that weakness belongs in the State field, not silently omitted.
+
+### State
+
+What is verified, inferred, unresolved, or not inspected. This is the epistemic accounting field. A response that marks everything as verified without distinguishing inferred conclusions from directly confirmed ones is not honest closure — it is a clean-sounding reconstruction that hides the actual confidence level of the work. See [Epistemic States](/concepts/epistemic-states) for the full vocabulary.
+
+The four categories:
+- **Verified** — directly confirmed from the source material during this response
+- **Inferred** — concluded from visible evidence but not directly confirmed
+- **Unresolved** — a question or ambiguity that remains open
+- **Not inspected** — material that is within the expected scope but was not read or checked
+
+### Convergence
+
+Whether the task is converged, divergent, or blocked.
+
+- **Converged** — the task is closed at the scope that was agreed upon; the live surface matches the intended state
+- **Divergent** — the task is still open; more work remains before it can be closed
+- **Blocked** — a stop condition holds; the assistant cannot proceed without operator input or external resolution
+
+Convergence is a statement about **task state**, not rhetoric. A response that sounds like a satisfying conclusion but leaves the task technically open should report **divergent**, not **converged**. The operator is the one who decides when convergence is sufficient — the assistant's job is to report the actual state accurately.
+
+## Alignment Throughout, Not Reconstruction at the End
+
+<Warning>
+  **Do not reconstruct the state footer from memory only at the end.** These fields should stay aligned with the actual task state as work proceeds. A footer reconstructed at the end from a general impression of what happened will smooth over the real epistemic texture of the session — conflating what was checked with what was assumed, or presenting a tidier convergence than the actual state supports.
+</Warning>
+
+Keep these fields in mind while working, not only when closing. If the ground shifts during the response — because a read revealed something unexpected, or because the target turned out to be different from what was initially identified — the final Ground and State should reflect where the work actually landed, not where it started.
+
+## Example Footer
+
+For a realistic scenario: an assistant was asked to rename a function in one file and verify that all call sites within the same module were updated.
+
+```text
+Touch: Renamed `parseUserRecord` to `hydrateUserRecord` in `models/user.ts`.
+       Call sites in `models/user.ts` updated (3 occurrences).
+       Left untouched: `services/userService.ts`, `tests/user.test.ts` — outside stated scope.
+
+Ground: Direct read of `models/user.ts`; grep for `parseUserRecord` within `models/` confirmed 3 call sites.
+
+State: Verified — rename applied, in-module call sites updated.
+       Not inspected — call sites outside `models/`; `services/` and `tests/` were not scanned.
+       Unresolved — whether external callers in `services/` need updating is not confirmed.
+
+Convergence: Divergent — in-scope rename is complete, but call sites outside `models/` have not been checked. Task is not fully closed until external callers are verified.
+```
+
+This footer makes visible exactly what the operator needs to decide next: the rename is done inside the module, but the task is divergent because the broader call graph was not inspected. The operator can now decide whether to expand scope, or treat the in-module change as sufficient for the current step.

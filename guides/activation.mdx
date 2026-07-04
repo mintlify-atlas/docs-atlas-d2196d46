@@ -1,0 +1,68 @@
+---
+title: "Activating and Maintaining the Contract"
+sidebarTitle: "Activation"
+description: "Learn what contract activation means, how to trigger it, and how to detect and recover from drift before it silently undermines a session."
+---
+
+Contract activation is not the same as reading a file. An assistant can read `AGENTS.md` once, store its content in working memory, and then proceed from first-visibility reasoning as if the file were background text. Activation means the file is the **operative frame** — it governs how every next response is read, bounded, and approached, not only which individual actions are permitted. Until activation is established, the contract exists but does not govern.
+
+## What Activation Means
+
+The contract defines five numbered rules for activation:
+
+<Steps>
+  <Step title="The file is an active operational contract">
+    `AGENTS.md` is not passive text or documentation. It is a live governing frame for the session.
+  </Step>
+  <Step title="Read the file in full before proceeding">
+    Partial reading is not activation. The file must be read end-to-end before any task work begins.
+  </Step>
+  <Step title="The file governs framing, not only action">
+    Activation means this file governs how the next response is **read, framed, and approached** — not only what actions are permitted.
+  </Step>
+  <Step title="The contract remains active for the session">
+    The contract stays in force for the entire session unless the operator explicitly states it does not apply to the current task. Treating the file as a one-time read is drift.
+  </Step>
+  <Step title="If drift is present, re-enter before continuing">
+    If drift is detected, the assistant must not proceed. Re-entry means rereading the file in full and reactivating it as the operative frame before continuing.
+  </Step>
+</Steps>
+
+## How to Instruct an Assistant to Activate
+
+Place `AGENTS.md` in the target project or workspace, open a fresh assistant session in an environment that can read workspace files, and issue the minimal operator instruction:
+
+```text
+Read AGENTS.md in full and use it as the operative frame before acting on this workspace.
+```
+
+Then give the real task normally. The file should remain active as a working frame throughout the session — it is not text that was read once and then set aside.
+
+## Drift
+
+<Warning>
+  **Drift is present when the contract is no longer the active frame.** Treating `AGENTS.md` as a one-time read, relying on it as memory-only guidance, or letting it recede into background text are all forms of drift. Drift does not require explicit abandonment — it can arrive silently as session momentum accumulates. An assistant that continues working after drift is present is operating outside the contract, even if the output looks plausible.
+</Warning>
+
+Drift looks like:
+
+- Responding without checking whether the current move is consistent with the contract's scope, posture, or stop conditions
+- Using conclusions from earlier in the session without re-grounding them in the contract frame
+- Treating the contract as one input among many rather than the governing frame
+- Expanding scope, skipping authority closure, or skipping the horizontal plane checks
+
+## Re-entry
+
+<Tip>
+  **Re-entry is the correct response to detected drift.** Re-entry means rereading `AGENTS.md` in full — not skimming a remembered summary — and reactivating it as the operative frame before continuing. A re-entry signal is not a failure event; it is the contract working as designed. Once reactivated, the assistant resumes from the contract frame, not from where session momentum had taken it.
+</Tip>
+
+## Conflict Handling
+
+If another local instruction in the workspace appears to conflict with `AGENTS.md`, the assistant must not switch silently. The correct behavior is to:
+
+1. Surface the conflict explicitly
+2. Name which instructions are in tension
+3. Wait for operator clarification before proceeding
+
+Silently deferring to the local instruction — without surfacing that a conflict exists — is a contract violation. The contract does not resolve conflicts by itself; it requires the operator to resolve them.

@@ -1,0 +1,134 @@
+---
+title: "Epistemic States: Verified, Inferred, Hypothetical"
+sidebarTitle: "Epistemic States"
+description: "The four epistemic categories the contract keeps distinct — verified, inferred, hypothetical, unresolved — and why collapsing them matters."
+---
+
+Keeping epistemic states distinct is one of the most consequential disciplines in the SensecraftXStudio contract — and one of the easiest to violate without noticing. The failure is not usually deliberate. An assistant reads a codebase, finds a pattern, and reports the pattern as if it were a confirmed fact. A grep result becomes a definitive count. A structural inference becomes a stated truth. The output sounds confident, the reasoning is locally coherent, and the collapse is invisible — until the operator acts on the report and the actual state turns out to be different. The contract interrupts this by requiring that every piece of information carried through a session be tagged with its actual epistemic standing: not what it looks like, but what the evidence actually supports.
+
+## The Four Epistemic States
+
+<Tabs>
+  <Tab title="Verified">
+    **Verified** means confirmed directly from the live surface, source, or direct inspection.
+
+    Verification requires more than a plausible match. It requires that the assistant actually read the source — opened the file, inspected the output, confirmed the state — and that the reading happened in the current session against the current state of the workspace.
+
+    **Examples:**
+    - "This function is defined in `utils/parse.ts` at line 47" — verified after opening and reading the file
+    - "The test suite passes" — verified after running the tests and reading the output
+    - "This configuration key is present with value `true`" — verified after inspecting the config file directly
+
+    **What verified is not:** a high-confidence inference, a result that has been true in the past, or a conclusion that follows logically from other verified facts. Logical entailment does not produce verification — direct inspection does.
+  </Tab>
+  <Tab title="Inferred">
+    **Inferred** means derived from evidence but not directly confirmed.
+
+    Inference is legitimate and often necessary. What the contract requires is that inference be labeled as inference, not presented as if it were verification. An inferred state is supported by evidence — it is not a guess — but the supporting evidence falls short of direct confirmation.
+
+    **Examples:**
+    - "This function is probably called from three places" — inferred from a grep result that returned three matches, without opening each call site
+    - "The config module appears to be the canonical source for these values" — inferred from its position in the directory structure and naming convention
+    - "This test is likely slow because of the network call in the setup" — inferred from reading the setup code, without profiling
+
+    **What inferred is not:** a verified state. Inference can be strong or weak, well-evidenced or poorly-evidenced, but it cannot be promoted to verification without direct inspection.
+  </Tab>
+  <Tab title="Hypothetical">
+    **Hypothetical** means a possible reading, not confirmed and not directly evidenced.
+
+    Hypothetical states are readings that have not been ruled out — they are plausible, they fit some surface signals, but they lack the evidence that would support inference. They are worth naming when they would change the meaning or consequence of a move, but they should not be treated as the basis for action.
+
+    **Examples:**
+    - "It is possible that a second configuration file overrides this value at runtime" — hypothetical, based on a general pattern, without evidence in this workspace
+    - "This import may be unused if the feature was removed last sprint" — hypothetical, based on a mentioned change, without inspection of the import graph
+    - "There may be a race condition here" — hypothetical, based on structural reading, without tracing the actual execution paths
+
+    **What hypothetical is not:** evidence of a problem. A hypothetical reading should surface a question, not a conclusion.
+  </Tab>
+  <Tab title="Unresolved / Not Inspected">
+    **Unresolved / Not Inspected** means the state is unknown because no inspection has been done.
+
+    This is the honest state when the assistant has not yet looked. It differs from inferred (which has evidence) and hypothetical (which has a shape) — unresolved means there is no basis yet for even a hypothesis. Naming the unresolved state is not a failure; it is the correct reporting of an open gap.
+
+    **Examples:**
+    - "Whether this function is called from test code is not inspected"
+    - "The production configuration has not been read in this session"
+    - "The relationship between these two modules is unresolved — no inspection has been done"
+
+    **What unresolved is not:** a problem to be filled in with inference. If the state is unresolved and the move depends on it, that is a stop condition — not an invitation to guess.
+  </Tab>
+</Tabs>
+
+---
+
+## Invariant 7: Keep Epistemic States Distinct
+
+Derived Invariant 7 of the contract states directly:
+
+> *Keep verified, inferred, and hypothetical states distinct. Keep epistemic state clear while reading, deciding, and reporting. Do not present inference as verification or possibility as settled state.*
+
+This invariant applies at all three phases — while reading, while deciding, and while reporting. Epistemic states are not just a final-report concern. They govern the reasoning throughout the session. A move grounded on an inferred state that was silently promoted to verified is a move grounded on a false base.
+
+<Warning>
+**The most common failure:** presenting inference as verification.
+
+This typically looks like: running a search, finding a result, and reporting the result as a confirmed fact — without distinguishing between "the search returned this" (inferred) and "I inspected the source directly" (verified). The output sounds trustworthy. The operator acts on it. The actual state is different.
+
+The contract does not prohibit inference. It prohibits reporting inference as if it were direct confirmation.
+</Warning>
+
+---
+
+## How Epistemic States Surface in Reporting
+
+The Final Response Contract requires a **State** field in every response with operational consequence. That field is where epistemic states are made visible:
+
+> *State: what is verified, inferred, unresolved, or not inspected.*
+
+The State field should not be a general summary of confidence. It should specifically name:
+- what was directly confirmed by inspection in this session
+- what was derived from evidence but not directly confirmed
+- what was not inspected and remains open
+- what is hypothetical but would change the move if confirmed
+
+<Tip>
+Keep epistemic states aligned as work proceeds. Do not reconstruct them from memory only at the end. A State field written from memory tends to smooth over the actual gaps — the honest state is only visible while the session is live.
+</Tip>
+
+See [Final Response Contract](/guides/final-response-contract) for the full structure.
+
+---
+
+## Concrete Examples in Technical Work
+
+The following examples show how the same information can carry different epistemic states depending on how it was obtained.
+
+**"This function is called from three places"**
+
+| How it was obtained | Epistemic state |
+|---------------------|----------------|
+| Grep returned three results; call sites not opened | Inferred — the search supports the count, but call sites not confirmed |
+| Each of the three files was opened and the call verified | Verified — direct inspection confirms each call |
+| The function looks like it would be called from three places based on its name | Hypothetical — no evidence, just pattern recognition |
+| The call graph has not been inspected | Unresolved / Not inspected |
+
+**"The configuration is loaded before the service starts"**
+
+| How it was obtained | Epistemic state |
+|---------------------|----------------|
+| Startup sequence read directly from `main.ts` | Verified |
+| Configuration imports appear before service imports in the file | Inferred — import order supports the reading, execution order not confirmed |
+| Services of this type usually load config first | Hypothetical — general pattern, not confirmed in this workspace |
+| Startup sequence not yet read | Unresolved / Not inspected |
+
+---
+
+## Why This Matters
+
+Epistemic discipline is not pedantry. It is what makes a session recoverable. When the assistant labels its states correctly:
+- the operator can see what the move is actually grounded on
+- gaps are visible before they become failures
+- the stop condition for "unresolved state that would change the move" can actually fire
+- the final report reflects the real session state, not a polished reconstruction of it
+
+The alternative — collapsing states, presenting inference as verification, moving forward on hypotheticals — produces sessions where the assistant sounds more grounded than it is. The aim of the contract is to make that gap harder to hide.

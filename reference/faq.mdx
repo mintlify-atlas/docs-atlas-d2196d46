@@ -1,0 +1,204 @@
+---
+title: "Frequently Asked Questions about SensecraftXStudio"
+sidebarTitle: "FAQ"
+description: "Answers to common questions about adopting, using, and understanding SensecraftXStudio as an operational contract for AI-assisted work."
+---
+
+If you are new to SensecraftXStudio or evaluating whether to adopt it, this FAQ addresses the most common questions that come up — including what the contract actually is, what it changes, what it does not promise, and how to adapt it to your own context. Answers are grounded directly in the [AGENTS.md](https://github.com/XxYouDeaDPunKxX/SensecraftXStudio/blob/main/AGENTS.md) contract and the README. For deeper explanations of individual concepts, follow the links within each answer.
+
+<AccordionGroup>
+
+  <Accordion title="What is SensecraftXStudio?">
+    SensecraftXStudio is a **working frame** — a compact operational contract — for AI-assisted technical work. It is built around a single file, `AGENTS.md`, which is placed in a project workspace and activated at the start of an assistant session.
+
+    Its job is to keep the assistant cognitively bounded before it acts: close the target, read the surrounding system, surface expansion before it happens, and report what is actually grounded at the end.
+
+    The contract covers six domains where operational consequence is real:
+
+    - Repository or workspace analysis
+    - Implementation inside an existing codebase
+    - Technical review
+    - Structured comparison
+    - Decision support
+    - Verification before closure
+
+    As the README puts it: *"It is a compact contract for how the assistant should read, decide, act, stop, and report when the work is not just conversational."*
+
+    <Tip>
+      The canonical unit of SensecraftXStudio is `AGENTS.md`. The README explains the project; `AGENTS.md` governs the behavior.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="What does it actually change about how an AI assistant behaves?">
+    Without a frame like SensecraftXStudio, an assistant moves too smoothly from a surface reading of a request straight into action. Common results include: acting on the wrong target, silently expanding scope, presenting inference as verification, and producing closing reports that sound cleaner than the actual state.
+
+    With the contract active, the session is pushed toward a different rhythm:
+
+    - Before acting, the assistant closes the real target — not the nearest visible candidate
+    - Before acting, it distinguishes the stated request, the actual local task, and the real object being touched
+    - Before acting, it identifies whether the move stays contained or expands scope, risk, or structure — and surfaces expansion before proceeding
+    - During and after, it keeps verified, inferred, hypothetical, and unresolved states explicitly distinct
+    - It stops when ambiguity would change the meaning or consequence of the move
+    - It closes with a compact state footer (Touch, Ground, State, Convergence) that reports actual task state rather than rhetorical resolution
+
+    The aim is not to make the assistant more confident. The aim, as the README states, is to make its confidence harder to fake.
+
+    See [Failure Patterns](/reference/failure-patterns) for the specific failure modes the contract is designed to counteract.
+  </Accordion>
+
+  <Accordion title="Is this a software library or package I need to install?">
+    No. SensecraftXStudio is not a software library, SDK, runtime worker, plugin, or generic prompt collection. There is nothing to install.
+
+    It is a plain text file — `AGENTS.md` — that you copy into your project or workspace. The assistant reads it at the start of a session and uses it as the operative frame for how it approaches, bounds, and reports on the work.
+
+    The only requirement is that the assistant session can read workspace files. Beyond that, no tooling, integration, or infrastructure is needed.
+
+    <Note>
+      The entire contract is contained in one Markdown file. You can inspect it, modify it, and version-control it alongside your project code.
+    </Note>
+  </Accordion>
+
+  <Accordion title="What AI assistants does it work with?">
+    SensecraftXStudio is designed to work with any AI assistant that can read workspace files and sustain a working frame across a session. The contract is plain text and makes no assumptions about the underlying model, platform, or tooling.
+
+    The practical requirement is that the assistant treats `AGENTS.md` as an active operative frame — not a one-time read that fades into background context. The contract itself defines what this means: the file governs how the next response is read, framed, and approached, not only what actions are permitted.
+
+    The contract also defines what drift looks like: treating the file as memory-only guidance or background text rather than the active frame. If drift occurs, the correct response is re-entry — rereading the file in full and reactivating it before continuing.
+
+    <Tip>
+      When starting a session, give the assistant a minimal instruction: *"Read AGENTS.md in full and use it as the operative frame before acting on this workspace."* Then give the real task.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="Does it slow down the assistant?">
+    It changes the rhythm of the session, but it does not necessarily make the assistant slower. The contract explicitly notes that its constraints do not mean long analysis every time — they mean the assistant should not jump from the first plausible reading straight into execution.
+
+    For simple, clearly bounded tasks, the overhead is minimal. The assistant closes the target, confirms it is contained, and proceeds. For complex or ambiguous tasks, the contract adds visible work — surfacing expansion, stopping for operator input, distinguishing epistemic states — but that work was always being done implicitly (or not being done, which was the problem). Making it explicit is the point.
+
+    The contract also establishes that inspection is preferred over asking when the workspace can answer the question safely. Unnecessary questions are a cost; the contract calibrates the ask/act threshold against actual consequence rather than comfort.
+  </Accordion>
+
+  <Accordion title="What is the difference between drift and the contract being deactivated?">
+    **Drift** is when the contract is nominally active but has stopped governing the assistant's actual framing. The file was read at the start of the session, but the assistant has since been treating it as background context, memory-only guidance, or a one-time policy — rather than the active operative frame for the current response.
+
+    Drift is present when the assistant's behavior is no longer consistent with the contract's requirements: acting before the object is closed, silently expanding scope, conflating inference with verification, or skipping the Final Response Contract footer on consequential responses.
+
+    **Deactivation** is when the operator explicitly states that the contract does not apply to the current task. That is a legitimate operator decision. Drift is not — it is a failure mode, not a feature.
+
+    The contract's re-entry procedure handles drift: if drift is detected, do not proceed. Reread `AGENTS.md` in full and reactivate it as the operative frame before continuing.
+
+    <Warning>
+      Treating the contract as a one-time read that "counts" for the rest of the session is the most common form of drift. The contract must be the active frame for each response, not a memory of a prior read.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="What happens when the assistant encounters a stop condition?">
+    A stop condition is a state in which the assistant should not proceed. The contract lists eight specific hold conditions:
+
+    - The context required is missing, conflicting, or insufficient to choose the move safely
+    - The real object being touched is not yet closed
+    - Authority for the move is missing or not closed
+    - Drift is present
+    - The move expands scope, risk, or structure and has not been surfaced
+    - The destination or target is ambiguous in a way that changes meaning or consequence
+    - More than one valid path remains and closure is not yet justified
+    - The current state is already incoherent and cannot be trusted as a base for forward fixing
+
+    When a stop condition holds, the prescribed response is:
+
+    1. Surface the condition
+    2. Name what is missing
+    3. Give the smallest unblock move
+    4. Wait — do not invent a resolution or proceed on assumption
+
+    If repeated iterations keep the same problem open without producing a corrective move, the contract requires the assistant to stop, name the stall, and choose the smallest exit: reset, remove, or ask.
+
+    See [Stop Conditions](/concepts/stop-conditions) for the full treatment.
+  </Accordion>
+
+  <Accordion title="How do I know if the contract is working?">
+    The contract produces several visible signals that operators can check:
+
+    **Before action:** The assistant names the real target, distinguishes it from the stated request if they differ, identifies the mode it is operating in, and surfaces any scope expansion before proceeding — not after.
+
+    **During work:** The assistant distinguishes what it has verified from what it has inferred. If it is uncertain in a way that would change the move, it stops and asks rather than proceeding on the most plausible reading.
+
+    **After action:** Responses with operational consequence close with the Final Response Contract footer — Touch, Ground, State, Convergence — that reports actual task state, including what was not inspected, what was inferred, and whether the task is genuinely converged.
+
+    If the assistant is jumping straight from request to execution, silently expanding scope, presenting inference as fact, or closing with summaries that sound cleaner than the actual state, the contract is not actively governing the session. That is drift.
+
+    <Tip>
+      The Final Response Contract footer is the most visible indicator. If consequential responses are not closing with Touch / Ground / State / Convergence, the contract has drifted.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="Can I modify AGENTS.md for my own use case?">
+    Yes. The contract is released under CC BY-SA 4.0, which permits adaptation as long as the derivative is shared under the same license and attribution is preserved.
+
+    The `Project Bootstrap` section is specifically designed to be filled in before relying on the contract for instance-specific context. It captures the canonical project path, auxiliary areas, technical context, and hard "do not touch" boundaries. An empty bootstrap means instance context is still open — the contract can operate but has no project-specific grounding.
+
+    When modifying the core behavioral sections, be aware that the invariants are interdependent. The contract is a layered structure: activation and scope govern when it applies; operating posture and invariants govern how framing must happen before action; stop conditions govern when to halt; and the Final Response Contract governs output. Changes to one layer may affect the coherence of others.
+
+    <Note>
+      If you introduce a local instruction that conflicts with `AGENTS.md`, the contract requires the assistant to surface the conflict and wait for operator clarification rather than switching silently. This applies to your own modifications as much as to any other local instructions.
+    </Note>
+  </Accordion>
+
+  <Accordion title="Is this a guarantee of correct behavior?">
+    No. As the README states explicitly: *"SensecraftXStudio does not make an AI deterministic. It does not replace technical judgment."*
+
+    The contract also does not guarantee that a host will preserve context, priority, or workspace access perfectly. AI assistants can still make mistakes, miss context, or produce incorrect output even with the contract active.
+
+    What the contract gives the assistant is a stronger cognitive frame for consequential work: read the real object, keep motion bounded, avoid silent expansion, and make closure inspectable. What it gives the operator is a clearer cognitive map of the session — what was seen, what was assumed, what was chosen, what was avoided, and what remains unsafe to close.
+
+    The aim is not correctness as a guarantee. The aim is recoverability: bad moves should be easier to interrupt, bound, and reverse before they spread.
+
+    <Warning>
+      Do not treat the Final Response Contract footer as a correctness certificate. It is a task state report. "Converged" means the assistant believes the task is closed based on what it has inspected — not that the output is verified to be correct by an independent standard.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="What is the Final Response Contract footer, and when does it appear?">
+    The Final Response Contract footer is a compact state report that appears at the end of responses that include a change, a recommendation, or a finding with operational consequence. It has four fields:
+
+    | Field | What it contains |
+    |-------|-----------------|
+    | **Touch** | What was changed and what was left untouched within the expected scope. Omitted if nothing was modified. |
+    | **Ground** | What the move or conclusion was grounded on — one line unless more detail is needed to avoid ambiguity. |
+    | **State** | What is verified, inferred, unresolved, or not inspected. |
+    | **Convergence** | Whether the task is converged, divergent, or blocked. |
+
+    These fields should stay aligned with actual task state as work proceeds — they should not be reconstructed from memory only at the end of a long session. Their purpose is to make the session inspectable: the operator gets a clear picture of what was actually done, what was assumed, and whether it is safe to act on the output.
+
+    The footer does not appear on purely conversational exchanges that have no operational consequence. It is triggered by consequential output: changes to files, recommendations that will be acted on, findings that will inform decisions.
+
+    <Note>
+      The four fields directly enforce [Derived Invariant 7](/reference/derived-invariants) (keep epistemic states distinct) and [Derived Invariant 9](/reference/derived-invariants) (report with disciplined closure) at the output level.
+    </Note>
+  </Accordion>
+
+  <Accordion title="How do I handle conflicts between AGENTS.md and other local instructions?">
+    The contract is explicit on this point: if another local instruction appears to conflict with `AGENTS.md`, the assistant should **not switch silently**. It must surface the conflict and wait for operator clarification.
+
+    This applies in both directions. If a local project rule or workspace instruction would require behavior that contradicts the contract, the assistant should name the conflict rather than quietly resolving it in favor of either source. The operator then decides which takes precedence.
+
+    The authority resolution order the contract specifies is: operator instruction first, canonical project rules if they exist, then verified workspace state. Local signals (filenames, freshness, tone, confidence) are treated last.
+
+    When in doubt, surface and wait. The contract explicitly prefers a visible pause over a silent decision.
+
+    <Tip>
+      If you are running SensecraftXStudio alongside other AI governance files or system prompts, make the precedence order explicit in your operator instructions at the start of the session. This prevents the assistant from having to infer it under ambiguity.
+    </Tip>
+  </Accordion>
+
+</AccordionGroup>
+
+---
+
+<Card
+  title="SensecraftXStudio on GitHub"
+  icon="github"
+  href="https://github.com/XxYouDeaDPunKxX/SensecraftXStudio"
+>
+  Open issues, contribute improvements, or fork the contract for your own use case. Licensed CC BY-SA 4.0.
+</Card>
